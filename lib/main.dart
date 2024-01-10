@@ -33,7 +33,8 @@ class MyApp extends StatelessWidget {
         'Dummies_Page': (context) => const Dummies_Page(),
         'Dummy1_Page': (context) => const Dummy1_Page(),
         'Dummy2_Page': (context) => const Dummy2_Page(),
-        //  other pages (none yet)        
+        //  other pages
+        'Meadow_Page': (context) => const Meadow_Page(),      
       },
     );
   }
