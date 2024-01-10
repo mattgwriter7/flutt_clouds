@@ -16,4 +16,6 @@ class Config {
 
   //  CUSTOM STUFF! (from here on this is stuff unique to this App)
   //  ... nuthin' here yet
+  static int window_width = 0;
+  static int window_height = 0;  
 }
