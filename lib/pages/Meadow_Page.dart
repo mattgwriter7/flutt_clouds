@@ -20,10 +20,18 @@ class _Meadow_PageState extends State<Meadow_Page> with TickerProviderStateMixin
 
   // (this page) variables
   static const String filename = 'Meadow_Page.dart';
-  late AnimationController _controller1;
-  final double  _leftMax        = 1000;
-  double        _left1          = 1000; 
-  
+  //  set up first cloud set
+  late AnimationController cloudset_1_controller;     //  it needs an animation controller
+  final double  cloudset_1_left_max = 1000;           //  the maximum size of the loop (which is half of the width of the cloud image)
+  double        cloudset_1_left_current = 1000;       //  the current position of the loop
+  final int cloudset_1_loop_duration  = 20000;        //  how long in ms is animaion loop? 
+
+  //  set up second cloud set
+  late AnimationController cloudset_2_controller;     //   
+  final double  cloudset_2_left_max = 1000;           //   
+  double        cloudset_2_left_current = 1000;       //   
+  final int cloudset_2_loop_duration  = 30000;        //   
+
   // (this page) init and dispose
   @override
   void initState() {
@@ -31,49 +39,62 @@ class _Meadow_PageState extends State<Meadow_Page> with TickerProviderStateMixin
     Utils.log( filename, 'initState()' );
     WidgetsBinding.instance.addPostFrameCallback((_) => _addPostFrameCallbackTriggered(context));
 
-    // setup CLOUDSET_1
-    _controller1 = AnimationController(
-      duration: Duration( milliseconds: 20000 ), // 
+    //  START: FIRST CLOUDSET LOGIC
+    cloudset_1_controller = AnimationController(
+      duration: Duration( milliseconds: cloudset_1_loop_duration ), // 
       vsync: this, 
     );
+    cloudset_1_controller.forward();     //  this sets the clouds into motion
 
-    _controller1.forward();
-    _controller1.repeat();    
-
-    _controller1.addListener(() {
-      // Utils.log( _controller1.value.toString() );
+    cloudset_1_controller.addListener(() {
+      //  it needs a listener to update the cloud position based on
+      //  the ticker value
       setState(() {
-        _left1 = 0 - (_leftMax * _controller1.value);
+        cloudset_1_left_current = 0 - (cloudset_1_left_max * cloudset_1_controller.value);
       });
+      //  Utils.log( filename, cloudset_1_controller.value.toString() );
     });
 
-    // we need a listener to detect when cloudset_1 animation is complete. When
-    // it is, restart
-    _controller1.addStatusListener((status) {
-      Utils.log( filename, ' 1 ' + status.toString());
-      if (status == AnimationStatus.completed) { _controller1.repeat();}
+    cloudset_1_controller.addStatusListener((status) {
+      //  it needs a status listener to repeat after complete  
+      if (status == AnimationStatus.completed) { cloudset_1_controller.repeat(); }
     });    
+    //  END: FIRST CLOUDSET LOGIC
+
+    //  START: SECOND CLOUDSET LOGIC
+    cloudset_2_controller = AnimationController(
+      duration: Duration( milliseconds: cloudset_2_loop_duration ), // 
+      vsync: this, 
+    );
+    cloudset_2_controller.forward();     //  this sets the clouds into motion
+
+    cloudset_2_controller.addListener(() {
+      //  it needs a listener to update the cloud position based on
+      //  the ticker value
+      setState(() {
+        cloudset_2_left_current = 0 - (cloudset_2_left_max * cloudset_2_controller.value);
+      });
+      //  Utils.log( filename, cloudset_1_controller.value.toString() );
+    });
+
+    cloudset_2_controller.addStatusListener((status) {
+      //  it needs a status listener to repeat after complete  
+      if (status == AnimationStatus.completed) { cloudset_2_controller.repeat(); }
+    });    
+    //  END: FIRST CLOUDSET LOGIC    
+
   }
 
   @override
   void dispose() {
     Utils.log( filename, ' dispose()');
+    cloudset_1_controller.dispose();
     super.dispose();
   }
 
   // (this page) methods
   void _buildTriggered() {
-    Utils.log( filename, ' _buildTriggered()');
-  }
-
-  void _updateUI() {
-    setState(() {
-      _controller1.duration = Duration(milliseconds: 0 );
-      // below is needed to get Duration to "take"...
-      if( _controller1.isAnimating) {
-        _controller1.forward();
-      }   
-    });
+    //  Utils.log( filename, ' _buildTriggered()');
   }
 
 Positioned kittyCat( int num ) {
@@ -118,7 +139,6 @@ Positioned kittyCat( int num ) {
   }
 
   // (this page) build
-  // (this page) build
   @override
   Widget build(BuildContext context) {
 
@@ -161,15 +181,25 @@ Positioned kittyCat( int num ) {
 
 
 
-                // ****************************
-                // CLOUDSSET TOP (Whitest)
-                // ****************************          
+                // **************************************
+                // CLOUDSSET 2 (Whitest, Top most clouds)
+                // **************************************          
                 Positioned(
-                  left: _left1,
+                  left: cloudset_2_left_current,
+                  top: 0,
+                  child: Image.asset('./assets/images/meadow/cloudset_medium.png'),
+                ),
+
+                // **************************************
+                // CLOUDSSET 1 (Whitest, Top most clouds)
+                // **************************************          
+                Positioned(
+                  left: cloudset_1_left_current,
                   top: 0,
                   child: Image.asset('./assets/images/meadow/cloudset_top.png'),
                 ),
                     
+
 
 
 
