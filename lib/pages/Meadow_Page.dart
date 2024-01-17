@@ -12,7 +12,7 @@ class Meadow_Page extends StatefulWidget {
   State createState() => _Meadow_PageState();
 }
 
-class _Meadow_PageState extends State<Meadow_Page> {
+class _Meadow_PageState extends State<Meadow_Page> with TickerProviderStateMixin {
 
   _Meadow_PageState() {
     Utils.log( 'Meadow_Page.dart', 'init' );
@@ -20,6 +20,9 @@ class _Meadow_PageState extends State<Meadow_Page> {
 
   // (this page) variables
   static const String filename = 'Meadow_Page.dart';
+  late AnimationController _controller1;
+  final double  _leftMax        = 1000;
+  double        _left1          = 1000; 
   
   // (this page) init and dispose
   @override
@@ -27,6 +30,29 @@ class _Meadow_PageState extends State<Meadow_Page> {
     super.initState();
     Utils.log( filename, 'initState()' );
     WidgetsBinding.instance.addPostFrameCallback((_) => _addPostFrameCallbackTriggered(context));
+
+    // setup CLOUDSET_1
+    _controller1 = AnimationController(
+      duration: Duration( milliseconds: 20000 ), // 
+      vsync: this, 
+    );
+
+    _controller1.forward();
+    _controller1.repeat();    
+
+    _controller1.addListener(() {
+      // Utils.log( _controller1.value.toString() );
+      setState(() {
+        _left1 = 0 - (_leftMax * _controller1.value);
+      });
+    });
+
+    // we need a listener to detect when cloudset_1 animation is complete. When
+    // it is, restart
+    _controller1.addStatusListener((status) {
+      Utils.log( filename, ' 1 ' + status.toString());
+      if (status == AnimationStatus.completed) { _controller1.repeat();}
+    });    
   }
 
   @override
@@ -39,7 +65,17 @@ class _Meadow_PageState extends State<Meadow_Page> {
   void _buildTriggered() {
     Utils.log( filename, ' _buildTriggered()');
   }
-  
+
+  void _updateUI() {
+    setState(() {
+      _controller1.duration = Duration(milliseconds: 0 );
+      // below is needed to get Duration to "take"...
+      if( _controller1.isAnimating) {
+        _controller1.forward();
+      }   
+    });
+  }
+
 Positioned kittyCat( int num ) {
 
     double sizer = 1;
@@ -126,20 +162,14 @@ Positioned kittyCat( int num ) {
 
 
                 // ****************************
-                // CLOUDS
+                // CLOUDSSET TOP (Whitest)
                 // ****************************          
-                Container(
-                  width: double.infinity,
-                  height: double.infinity,
-                  decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image:
-                      AssetImage('./assets/images/meadow/clouds_01.png'),
-                      fit: BoxFit.cover,
-                      //alignment: Alignment.center,
-                    ),
-                  ),   
-                ),  
+                Positioned(
+                  left: _left1,
+                  top: 0,
+                  child: Image.asset('./assets/images/meadow/cloudset_top.png'),
+                ),
+                    
 
 
 
