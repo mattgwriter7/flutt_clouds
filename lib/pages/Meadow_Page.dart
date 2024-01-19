@@ -12,7 +12,7 @@ class Meadow_Page extends StatefulWidget {
   State createState() => _Meadow_PageState();
 }
 
-class _Meadow_PageState extends State<Meadow_Page> {
+class _Meadow_PageState extends State<Meadow_Page> with TickerProviderStateMixin {
 
   _Meadow_PageState() {
     Utils.log( 'Meadow_Page.dart', 'init' );
@@ -20,26 +20,83 @@ class _Meadow_PageState extends State<Meadow_Page> {
 
   // (this page) variables
   static const String filename = 'Meadow_Page.dart';
-  
+  //  set up first cloud set
+  late AnimationController cloudset_1_controller;     //  it needs an animation controller
+  final double  cloudset_1_left_max = 1000;           //  the maximum size of the loop (which is half of the width of the cloud image)
+  double        cloudset_1_left_current = 1000;       //  the current position of the loop
+  final int cloudset_1_loop_duration  = 20000;        //  how long in ms is animaion loop? 
+
+  //  set up second cloud set
+  late AnimationController cloudset_2_controller;     //   
+  final double  cloudset_2_left_max = 1000;           //   
+  double        cloudset_2_left_current = 1000;       //   
+  final int cloudset_2_loop_duration  = 30000;        //   
+
   // (this page) init and dispose
   @override
   void initState() {
     super.initState();
     Utils.log( filename, 'initState()' );
     WidgetsBinding.instance.addPostFrameCallback((_) => _addPostFrameCallbackTriggered(context));
+
+    //  START: FIRST CLOUDSET LOGIC
+    cloudset_1_controller = AnimationController(
+      duration: Duration( milliseconds: cloudset_1_loop_duration ), // 
+      vsync: this, 
+    );
+    cloudset_1_controller.forward();     //  this sets the clouds into motion
+
+    cloudset_1_controller.addListener(() {
+      //  it needs a listener to update the cloud position based on
+      //  the ticker value
+      setState(() {
+        cloudset_1_left_current = 0 - (cloudset_1_left_max * cloudset_1_controller.value);
+      });
+      //  Utils.log( filename, cloudset_1_controller.value.toString() );
+    });
+
+    cloudset_1_controller.addStatusListener((status) {
+      //  it needs a status listener to repeat after complete  
+      if (status == AnimationStatus.completed) { cloudset_1_controller.repeat(); }
+    });    
+    //  END: FIRST CLOUDSET LOGIC
+
+    //  START: SECOND CLOUDSET LOGIC
+    cloudset_2_controller = AnimationController(
+      duration: Duration( milliseconds: cloudset_2_loop_duration ), // 
+      vsync: this, 
+    );
+    cloudset_2_controller.forward();     //  this sets the clouds into motion
+
+    cloudset_2_controller.addListener(() {
+      //  it needs a listener to update the cloud position based on
+      //  the ticker value
+      setState(() {
+        cloudset_2_left_current = 0 - (cloudset_2_left_max * cloudset_2_controller.value);
+      });
+      //  Utils.log( filename, cloudset_1_controller.value.toString() );
+    });
+
+    cloudset_2_controller.addStatusListener((status) {
+      //  it needs a status listener to repeat after complete  
+      if (status == AnimationStatus.completed) { cloudset_2_controller.repeat(); }
+    });    
+    //  END: FIRST CLOUDSET LOGIC    
+
   }
 
   @override
   void dispose() {
     Utils.log( filename, ' dispose()');
+    cloudset_1_controller.dispose();
     super.dispose();
   }
 
   // (this page) methods
   void _buildTriggered() {
-    Utils.log( filename, ' _buildTriggered()');
+    //  Utils.log( filename, ' _buildTriggered()');
   }
-  
+
 Positioned kittyCat( int num ) {
 
     double sizer = 1;
@@ -81,7 +138,6 @@ Positioned kittyCat( int num ) {
     Utils.log( filename, ' _addPostFrameCallbackTriggered()');
   }
 
-  // (this page) build
   // (this page) build
   @override
   Widget build(BuildContext context) {
@@ -125,21 +181,25 @@ Positioned kittyCat( int num ) {
 
 
 
-                // ****************************
-                // CLOUDS
-                // ****************************          
-                Container(
-                  width: double.infinity,
-                  height: double.infinity,
-                  decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image:
-                      AssetImage('./assets/images/meadow/clouds_01.png'),
-                      fit: BoxFit.cover,
-                      //alignment: Alignment.center,
-                    ),
-                  ),   
-                ),  
+                // **************************************
+                // CLOUDSSET 2 (Whitest, Top most clouds)
+                // **************************************          
+                Positioned(
+                  left: cloudset_2_left_current,
+                  top: 0,
+                  child: Image.asset('./assets/images/meadow/cloudset_medium.png'),
+                ),
+
+                // **************************************
+                // CLOUDSSET 1 (Whitest, Top most clouds)
+                // **************************************          
+                Positioned(
+                  left: cloudset_1_left_current,
+                  top: 0,
+                  child: Image.asset('./assets/images/meadow/cloudset_top.png'),
+                ),
+                    
+
 
 
 
